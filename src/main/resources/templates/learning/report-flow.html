@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Report Generation Flow - Learning Mode</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Payroll Reporting Lab</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="/">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/reports">Reports</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/learning">Learning Mode</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/h2-console" target="_blank">H2 Console</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container mt-4">
+        <h1>Report Generation Flow</h1>
+        
+        <div class="card mb-3">
+            <div class="card-header bg-primary text-white">
+                <h5>Step 1: User Request</h5>
+            </div>
+            <div class="card-body">
+                <p>User navigates to <code>/reports/payroll-summary?country=Kenya&payrollMonth=2025-01</code></p>
+                <p>The controller receives the report name and parameters</p>
+            </div>
+        </div>
+        
+        <div class="card mb-3">
+            <div class="card-header bg-success text-white">
+                <h5>Step 2: Lookup Report Metadata</h5>
+            </div>
+            <div class="card-body">
+                <p>ReportBuilderService queries <code>report_sources</code> table:</p>
+                <pre>SELECT * FROM report_sources WHERE rpt_name = 'payroll-summary'</pre>
+                <p>This returns the base query and report description</p>
+            </div>
+        </div>
+        
+        <div class="card mb-3">
+            <div class="card-header bg-info text-white">
+                <h5>Step 3: Get Column Definitions</h5>
+            </div>
+            <div class="card-body">
+                <p>Service queries <code>report_columns</code> table:</p>
+                <pre>SELECT * FROM report_columns WHERE rpt_src_id = ? ORDER BY rpt_col_order</pre>
+                <p>This defines which columns to display and their order</p>
+            </div>
+        </div>
+        
+        <div class="card mb-3">
+            <div class="card-header bg-warning">
+                <h5>Step 4: Build Dynamic SQL</h5>
+            </div>
+            <div class="card-body">
+                <p>Service constructs SQL query:</p>
+                <pre>SELECT employee_name, country, department, payroll_month, gross_salary, tax_amount, pension, net_salary
+FROM (base_query) base_data
+WHERE country = 'Kenya' AND payroll_month = '2025-01'</pre>
+            </div>
+        </div>
+        
+        <div class="card mb-3">
+            <div class="card-header bg-danger text-white">
+                <h5>Step 5: Execute Query</h5>
+            </div>
+            <div class="card-body">
+                <p>JdbcTemplate executes the query and returns results as List&lt;Map&lt;String, Object&gt;&gt;</p>
+                <p>Each row is a map of column names to values</p>
+            </div>
+        </div>
+        
+        <div class="card mb-3">
+            <div class="card-header bg-secondary text-white">
+                <h5>Step 6: Render Template</h5>
+            </div>
+            <div class="card-body">
+                <p>Thymeleaf template receives ReportData object and renders HTML table:</p>
+                <pre>&lt;tr th:each="row : ${report.rows}"&gt;
+    &lt;td th:each="col : ${report.columns}" th:text="${row.get(col)}"&gt;&lt;/td&gt;
+&lt;/tr&gt;</pre>
+            </div>
+        </div>
+        
+        <div class="card mb-3">
+            <div class="card-header bg-dark text-white">
+                <h5>Step 7: Export (Optional)</h5>
+            </div>
+            <div class="card-body">
+                <p>If user clicks export button:</p>
+                <ul>
+                    <li>ExportService receives the same ReportData</li>
+                    <li>Converts to Excel using Apache POI or CSV using OpenCSV</li>
+                    <li>Returns file as download</li>
+                </ul>
+            </div>
+        </div>
+        
+        <h3>Key Components</h3>
+        <ul>
+            <li><strong>ReportController:</strong> Handles HTTP requests</li>
+            <li><strong>ReportBuilderService:</strong> Orchestrates report generation</li>
+            <li><strong>JdbcTemplate:</strong> Executes dynamic SQL queries</li>
+            <li><strong>ExportService:</strong> Converts data to Excel/CSV</li>
+            <li><strong>Thymeleaf:</strong> Renders HTML views</li>
+        </ul>
+        
+        <a href="/learning" class="btn btn-secondary">Back to Learning Mode</a>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

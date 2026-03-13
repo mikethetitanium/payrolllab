@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SQL Queries - Learning Mode</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Payroll Reporting Lab</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="/">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/reports">Reports</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/learning">Learning Mode</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/h2-console" target="_blank">H2 Console</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container mt-4">
+        <h1>SQL Queries Used in Reports</h1>
+        
+        <div th:each="report : ${reports}" class="card mb-3">
+            <div class="card-header">
+                <h5 th:text="${report.rptName}">Report Name</h5>
+            </div>
+            <div class="card-body">
+                <p th:text="${report.description}">Description</p>
+                <h6>Base Query:</h6>
+                <pre class="bg-light p-3" th:text="${report.baseQuery}">SQL Query</pre>
+                
+                <div class="alert alert-info">
+                    <strong>Explanation:</strong> This query retrieves payroll data by joining employee, payroll run, 
+                    and payroll result tables. The report builder adds WHERE clauses based on user-selected parameters.
+                </div>
+            </div>
+        </div>
+        
+        <a href="/learning" class="btn btn-secondary">Back to Learning Mode</a>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

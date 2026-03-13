@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Data Model - Learning Mode</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Payroll Reporting Lab</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="/">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/reports">Reports</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/learning">Learning Mode</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/h2-console" target="_blank">H2 Console</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container mt-4">
+        <h1>Payroll Data Model</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-header bg-primary text-white"><h5>employees</h5></div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li><strong>id</strong> (PK)</li>
+                            <li>employee_name</li>
+                            <li>country</li>
+                            <li>department</li>
+                            <li>hire_date</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-header bg-primary text-white"><h5>payroll_runs</h5></div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li><strong>id</strong> (PK)</li>
+                            <li>payroll_month</li>
+                            <li>country</li>
+                            <li>run_date</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-header bg-success text-white"><h5>payroll_results</h5></div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li><strong>id</strong> (PK)</li>
+                            <li>employee_id (FK → employees)</li>
+                            <li>payroll_run_id (FK → payroll_runs)</li>
+                            <li>gross_salary</li>
+                            <li>tax_amount</li>
+                            <li>pension</li>
+                            <li>net_salary</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-header bg-info text-white"><h5>deductions</h5></div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li><strong>id</strong> (PK)</li>
+                            <li>employee_id (FK → employees)</li>
+                            <li>deduction_type</li>
+                            <li>amount</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <h3>Relationships</h3>
+        <ul>
+            <li><strong>employees</strong> → <strong>payroll_results</strong>: One employee has many payroll results (one per month)</li>
+            <li><strong>payroll_runs</strong> → <strong>payroll_results</strong>: One payroll run contains many employee results</li>
+            <li><strong>employees</strong> → <strong>deductions</strong>: One employee can have multiple deductions</li>
+        </ul>
+        
+        <h3>Key Concepts</h3>
+        <div class="alert alert-info">
+            <ul>
+                <li><strong>Payroll Run:</strong> Represents a payroll processing cycle for a specific country and month</li>
+                <li><strong>Payroll Result:</strong> The calculated payroll for one employee in one payroll run</li>
+                <li><strong>Gross Salary:</strong> Total salary before deductions</li>
+                <li><strong>Net Salary:</strong> Take-home pay after tax and pension deductions</li>
+            </ul>
+        </div>
+        
+        <a href="/learning" class="btn btn-secondary">Back to Learning Mode</a>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

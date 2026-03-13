@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${report.reportName}">Report</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Payroll Reporting Lab</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="/">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/reports">Reports</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/learning">Learning Mode</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/h2-console" target="_blank">H2 Console</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container mt-4">
+        <h1 th:text="${report.reportName}">Report Name</h1>
+        <p th:text="${report.description}">Description</p>
+        
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5>Filter Parameters</h5>
+                <form method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Country</label>
+                        <select name="country" class="form-select">
+                            <option value="">All</option>
+                            <option th:each="c : ${countries}" th:value="${c}" th:text="${c}">Country</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Payroll Month</label>
+                        <select name="payrollMonth" class="form-select">
+                            <option value="">All</option>
+                            <option th:each="m : ${payrollMonths}" th:value="${m}" th:text="${m}">Month</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Department</label>
+                        <select name="department" class="form-select">
+                            <option value="">All</option>
+                            <option th:each="d : ${departments}" th:value="${d}" th:text="${d}">Department</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">&nbsp;</label>
+                        <button type="submit" class="btn btn-primary d-block w-100">Apply Filters</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <a th:href="@{/reports/{name}/export/excel(name=${report.reportName}, country=${param.country}, payrollMonth=${param.payrollMonth}, department=${param.department})}" 
+               class="btn btn-success">Export to Excel</a>
+            <a th:href="@{/reports/{name}/export/csv(name=${report.reportName}, country=${param.country}, payrollMonth=${param.payrollMonth}, department=${param.department})}" 
+               class="btn btn-info">Export to CSV</a>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-striped table-sm report-table">
+                <thead class="table-dark">
+                    <tr>
+                        <th th:each="col : ${report.columns}" th:text="${col}">Column</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="row : ${report.rows}">
+                        <td th:each="col : ${report.columns}" th:text="${row.get(col.toLowerCase())}">Value</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="alert alert-info mt-3">
+            <strong>SQL Query:</strong>
+            <pre th:text="${report.sqlQuery}">SQL</pre>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
