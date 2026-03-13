@@ -42,9 +42,9 @@ public class ReportController {
     
     @GetMapping("/{reportName}")
     public String viewReport(@PathVariable String reportName,
-                            @RequestParam(required = false) String country,
-                            @RequestParam(required = false) String payrollMonth,
-                            @RequestParam(required = false) String department,
+                            @RequestParam(name = "country", required = false) String country,
+                            @RequestParam(name = "payrollMonth", required = false) String payrollMonth,
+                            @RequestParam(name = "department", required = false) String department,
                             Model model) {
         
         Map<String, Object> parameters = new HashMap<>();
@@ -64,9 +64,9 @@ public class ReportController {
     
     @GetMapping("/{reportName}/export/excel")
     public ResponseEntity<byte[]> exportExcel(@PathVariable String reportName,
-                                              @RequestParam(required = false) String country,
-                                              @RequestParam(required = false) String payrollMonth,
-                                              @RequestParam(required = false) String department) {
+                                              @RequestParam(name = "country", required = false) String country,
+                                              @RequestParam(name = "payrollMonth", required = false) String payrollMonth,
+                                              @RequestParam(name = "department", required = false) String department) {
         
         Map<String, Object> parameters = new HashMap<>();
         if (country != null) parameters.put("country", country);
@@ -84,9 +84,9 @@ public class ReportController {
     
     @GetMapping("/{reportName}/export/csv")
     public ResponseEntity<String> exportCsv(@PathVariable String reportName,
-                                           @RequestParam(required = false) String country,
-                                           @RequestParam(required = false) String payrollMonth,
-                                           @RequestParam(required = false) String department) {
+                                           @RequestParam(name = "country", required = false) String country,
+                                           @RequestParam(name = "payrollMonth", required = false) String payrollMonth,
+                                           @RequestParam(name = "department", required = false) String department) {
         
         Map<String, Object> parameters = new HashMap<>();
         if (country != null) parameters.put("country", country);
@@ -103,8 +103,8 @@ public class ReportController {
     }
     
     @GetMapping("/validate")
-    public String validateReport(@RequestParam String payrollMonth,
-                                 @RequestParam String country,
+    public String validateReport(@RequestParam(name = "payrollMonth") String payrollMonth,
+                                 @RequestParam(name = "country") String country,
                                  Model model) {
         
         List<ValidationResult> results = validationService.validatePayrollReport(payrollMonth, country);
