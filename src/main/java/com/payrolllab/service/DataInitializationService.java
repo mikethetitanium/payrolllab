@@ -105,8 +105,8 @@ public class DataInitializationService implements CommandLineRunner {
                     BigDecimal taxRate = BigDecimal.valueOf(0.20 + random.nextDouble() * 0.10);
                     BigDecimal pensionRate = BigDecimal.valueOf(0.05);
                     
-                    BigDecimal taxAmount = grossSalary.multiply(taxRate).setScale(2, BigDecimal.ROUND_HALF_UP);
-                    BigDecimal pension = grossSalary.multiply(pensionRate).setScale(2, BigDecimal.ROUND_HALF_UP);
+                    BigDecimal taxAmount = grossSalary.multiply(taxRate).setScale(2, java.math.RoundingMode.HALF_UP);
+                    BigDecimal pension = grossSalary.multiply(pensionRate).setScale(2, java.math.RoundingMode.HALF_UP);
                     BigDecimal netSalary = grossSalary.subtract(taxAmount).subtract(pension);
                     
                     result.setGrossSalary(grossSalary);
@@ -190,6 +190,7 @@ public class DataInitializationService implements CommandLineRunner {
             SELECT 
                 e.employee_name,
                 e.country,
+                e.department,
                 pr.payroll_month,
                 pres.gross_salary,
                 pres.tax_amount,
@@ -199,7 +200,22 @@ public class DataInitializationService implements CommandLineRunner {
             JOIN employees e ON pres.employee_id = e.id
             JOIN payroll_runs pr ON pres.payroll_run_id = pr.id
             """);
-        reportSourceRepository.save(report);
+        report = reportSourceRepository.save(report);
+        
+        String[] columns = {"employee_name", "country", "department", "payroll_month", 
+                           "gross_salary", "tax_amount", "pension", "net_salary"};
+        String[] aliases = {"Employee", "Country", "Department", "Month", 
+                           "Gross", "Tax", "Pension", "Net"};
+        
+        for (int i = 0; i < columns.length; i++) {
+            ReportColumn col = new ReportColumn();
+            col.setRptSrcId(report.getRptSrcId());
+            col.setRptColName(columns[i]);
+            col.setRptColAlias(aliases[i]);
+            col.setRptColOrder(i + 1);
+            col.setRptColDataType("VARCHAR");
+            reportColumnRepository.save(col);
+        }
     }
     
     private void createDepartmentCostReport() {
@@ -218,7 +234,20 @@ public class DataInitializationService implements CommandLineRunner {
             JOIN payroll_runs pr ON pres.payroll_run_id = pr.id
             GROUP BY e.department, e.country
             """);
-        reportSourceRepository.save(report);
+        report = reportSourceRepository.save(report);
+        
+        String[] columns = {"department", "country", "employee_count", "total_gross", "total_net"};
+        String[] aliases = {"Department", "Country", "Employees", "Total Gross", "Total Net"};
+        
+        for (int i = 0; i < columns.length; i++) {
+            ReportColumn col = new ReportColumn();
+            col.setRptSrcId(report.getRptSrcId());
+            col.setRptColName(columns[i]);
+            col.setRptColAlias(aliases[i]);
+            col.setRptColOrder(i + 1);
+            col.setRptColDataType("VARCHAR");
+            reportColumnRepository.save(col);
+        }
     }
     
     private void createCountryTotalsReport() {
@@ -239,6 +268,19 @@ public class DataInitializationService implements CommandLineRunner {
             JOIN payroll_runs pr ON pres.payroll_run_id = pr.id
             GROUP BY e.country, pr.payroll_month
             """);
-        reportSourceRepository.save(report);
+        report = reportSourceRepository.save(report);
+        
+        String[] columns = {"country", "payroll_month", "employee_count", "total_gross", "total_tax", "total_pension", "total_net"};
+        String[] aliases = {"Country", "Month", "Employees", "Total Gross", "Total Tax", "Total Pension", "Total Net"};
+        
+        for (int i = 0; i < columns.length; i++) {
+            ReportColumn col = new ReportColumn();
+            col.setRptSrcId(report.getRptSrcId());
+            col.setRptColName(columns[i]);
+            col.setRptColAlias(aliases[i]);
+            col.setRptColOrder(i + 1);
+            col.setRptColDataType("VARCHAR");
+            reportColumnRepository.save(col);
+        }
     }
 }

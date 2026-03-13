@@ -42,7 +42,7 @@ This application teaches and demonstrates:
 - Java 17
 - Spring Boot 3.5.11
 - Spring Data JPA
-- H2 Database (in-memory, can be switched to PostgreSQL/MS SQL)
+- **MS SQL Server** (or PostgreSQL/H2)
 - JdbcTemplate for dynamic queries
 
 ### Frontend
@@ -134,17 +134,27 @@ mvnw.cmd spring-boot:run
 http://localhost:8080
 ```
 
-### H2 Database Console
+### Database Configuration
 
-Access the H2 console for direct database queries:
-```
-http://localhost:8080/h2-console
+The system comes with **H2 (in-memory)** by default for quick learning. You can easily switch to SQL Server or PostgreSQL.
+
+**Quick Switch to SQL Server:**
+
+Edit `src/main/resources/application.properties`:
+
+```properties
+# Comment out H2
+# spring.datasource.url=jdbc:h2:mem:payrolldb
+
+# Uncomment SQL Server
+spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=payrolldb;encrypt=true;trustServerCertificate=true
+spring.datasource.driverClassName=com.microsoft.sqlserver.jdbc.SQLServerDriver
+spring.datasource.username=sa
+spring.datasource.password=YourPassword123!
+spring.jpa.database-platform=org.hibernate.dialect.SQLServerDialect
 ```
 
-Connection details:
-- JDBC URL: `jdbc:h2:mem:payrolldb`
-- Username: `sa`
-- Password: (leave empty)
+See [DATABASE_CONFIGURATION.md](DATABASE_CONFIGURATION.md) for all options and [SQL_SERVER_SETUP.md](SQL_SERVER_SETUP.md) for detailed SQL Server setup.
 
 ## Project Structure
 
