@@ -68,7 +68,7 @@ public class ReportBuilderService {
                     ReportColumn col = columns.get(i);
                     query.append(col.getRptColName());
                     if (col.getRptColAlias() != null) {
-                        query.append(" AS ").append(col.getRptColAlias());
+                        query.append(" AS \"").append(col.getRptColAlias()).append("\"");
                     }
                     if (i < columns.size() - 1) {
                         query.append(", ");
@@ -90,7 +90,7 @@ public class ReportBuilderService {
                 ReportColumn col = columns.get(i);
                 query.append(col.getRptColName());
                 if (col.getRptColAlias() != null) {
-                    query.append(" AS ").append(col.getRptColAlias());
+                    query.append(" AS \"").append(col.getRptColAlias()).append("\"");
                 }
                 if (i < columns.size() - 1) {
                     query.append(", ");
@@ -126,12 +126,12 @@ public class ReportBuilderService {
             return baseQuery + " WHERE 1=1" + buildWhereConditions(parameters);
         }
         
-        // Build WHERE clause
+        // Build WHERE clause with table aliases (e.g., e.department, pr.payroll_month)
         StringBuilder whereClause = new StringBuilder(" WHERE 1=1");
         parameters.forEach((key, value) -> {
             if (value != null && !value.toString().isEmpty()) {
-                String columnName = mapParameterToColumn(key);
-                whereClause.append(" AND ").append(columnName).append(" = '").append(value).append("'");
+                String columnCondition = mapParameterToTableColumn(key);
+                whereClause.append(" AND ").append(columnCondition).append(" = '").append(value).append("'");
             }
         });
         
@@ -160,6 +160,17 @@ public class ReportBuilderService {
             case "payrollMonth" -> "payroll_month";
             case "payroll_month" -> "payroll_month";
             case "department" -> "department";
+            default -> parameterName;
+        };
+    }
+    
+    private String mapParameterToTableColumn(String parameterName) {
+        // Map URL parameter names to table-qualified column names for WHERE clause in aggregated queries
+        return switch (parameterName) {
+            case "country" -> "e.country";
+            case "payrollMonth" -> "pr.payroll_month";
+            case "payroll_month" -> "pr.payroll_month";
+            case "department" -> "e.department";
             default -> parameterName;
         };
     }
