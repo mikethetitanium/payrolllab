@@ -30,6 +30,12 @@ public class DataInitializationService implements CommandLineRunner {
     public void run(String... args) {
         log.info("Initializing payroll data...");
         
+        // Check if data already exists
+        if (employeeRepository.count() > 0) {
+            log.info("Data already exists. Skipping initialization.");
+            return;
+        }
+        
         // Create employees
         List<Employee> employees = createEmployees();
         employeeRepository.saveAll(employees);
