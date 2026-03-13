@@ -20,9 +20,6 @@ public class DataInitializationService implements CommandLineRunner {
     private final PayrollRunRepository payrollRunRepository;
     private final PayrollResultRepository payrollResultRepository;
     private final DeductionRepository deductionRepository;
-    private final ReportSourceRepository reportSourceRepository;
-    private final ReportColumnRepository reportColumnRepository;
-    private final ReportParameterRepository reportParameterRepository;
     
     private final Random random = new Random();
     
@@ -52,20 +49,17 @@ public class DataInitializationService implements CommandLineRunner {
         List<Deduction> deductions = createDeductions(employees);
         deductionRepository.saveAll(deductions);
         
-        // Create report metadata
-        createReportMetadata();
-        
         log.info("Data initialization complete!");
     }
     
     private List<Employee> createEmployees() {
         List<Employee> employees = new ArrayList<>();
-        String[] countries = {"Kenya", "UK", "Germany", "UAE"};
-        String[] departments = {"Engineering", "Sales", "HR", "Finance", "Operations"};
+        String[] countries = {"Kenya", "UK", "Germany", "UAE", "India"};
+        String[] departments = {"Engineering", "Finance", "HR", "Sales", "Marketing"};
         String[] firstNames = {"John", "Jane", "Michael", "Sarah", "David", "Emma", "James", "Olivia"};
         String[] lastNames = {"Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis"};
         
-        for (int i = 0; i < 200; i++) {
+        for (int i = 0; i < 300; i++) {
             Employee emp = new Employee();
             emp.setEmployeeName(firstNames[random.nextInt(firstNames.length)] + " " + 
                               lastNames[random.nextInt(lastNames.length)]);
@@ -80,7 +74,7 @@ public class DataInitializationService implements CommandLineRunner {
     
     private List<PayrollRun> createPayrollRuns() {
         List<PayrollRun> runs = new ArrayList<>();
-        String[] countries = {"Kenya", "UK", "Germany", "UAE"};
+        String[] countries = {"Kenya", "UK", "Germany", "UAE", "India"};
         String[] months = {"2025-01", "2025-02", "2025-03", "2025-04", "2025-05", "2025-06",
                           "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12"};
         
@@ -143,150 +137,5 @@ public class DataInitializationService implements CommandLineRunner {
         }
         
         return deductions;
-    }
-    
-    private void createReportMetadata() {
-        createPayrollSummaryReport();
-        createEmployeePayslipReport();
-        createDepartmentCostReport();
-        createCountryTotalsReport();
-    }
-    
-    private void createPayrollSummaryReport() {
-        ReportSource report = new ReportSource();
-        report.setRptName("payroll-summary");
-        report.setDescription("Monthly Payroll Summary Report");
-        report.setBaseQuery("""
-            SELECT 
-                e.employee_name,
-                e.country,
-                e.department,
-                pr.payroll_month,
-                pres.gross_salary,
-                pres.tax_amount,
-                pres.pension,
-                pres.net_salary
-            FROM payroll_results pres
-            JOIN employees e ON pres.employee_id = e.id
-            JOIN payroll_runs pr ON pres.payroll_run_id = pr.id
-            """);
-        reportSourceRepository.save(report);
-        
-        String[] columns = {"employee_name", "country", "department", "payroll_month", 
-                           "gross_salary", "tax_amount", "pension", "net_salary"};
-        String[] aliases = {"Employee", "Country", "Department", "Month", 
-                           "Gross", "Tax", "Pension", "Net"};
-        
-        for (int i = 0; i < columns.length; i++) {
-            ReportColumn col = new ReportColumn();
-            col.setRptSrcId(report.getRptSrcId());
-            col.setRptColName(columns[i]);
-            col.setRptColAlias(aliases[i]);
-            col.setRptColOrder(i + 1);
-            col.setRptColDataType("VARCHAR");
-            reportColumnRepository.save(col);
-        }
-    }
-    
-    private void createEmployeePayslipReport() {
-        ReportSource report = new ReportSource();
-        report.setRptName("employee-payslip");
-        report.setDescription("Individual Employee Payslip");
-        report.setBaseQuery("""
-            SELECT 
-                e.employee_name,
-                e.country,
-                e.department,
-                pr.payroll_month,
-                pres.gross_salary,
-                pres.tax_amount,
-                pres.pension,
-                pres.net_salary
-            FROM payroll_results pres
-            JOIN employees e ON pres.employee_id = e.id
-            JOIN payroll_runs pr ON pres.payroll_run_id = pr.id
-            """);
-        report = reportSourceRepository.save(report);
-        
-        String[] columns = {"employee_name", "country", "department", "payroll_month", 
-                           "gross_salary", "tax_amount", "pension", "net_salary"};
-        String[] aliases = {"Employee", "Country", "Department", "Month", 
-                           "Gross", "Tax", "Pension", "Net"};
-        
-        for (int i = 0; i < columns.length; i++) {
-            ReportColumn col = new ReportColumn();
-            col.setRptSrcId(report.getRptSrcId());
-            col.setRptColName(columns[i]);
-            col.setRptColAlias(aliases[i]);
-            col.setRptColOrder(i + 1);
-            col.setRptColDataType("VARCHAR");
-            reportColumnRepository.save(col);
-        }
-    }
-    
-    private void createDepartmentCostReport() {
-        ReportSource report = new ReportSource();
-        report.setRptName("department-cost");
-        report.setDescription("Department Payroll Cost Analysis");
-        report.setBaseQuery("""
-            SELECT 
-                e.department,
-                e.country,
-                COUNT(DISTINCT e.id) as employee_count,
-                SUM(pres.gross_salary) as total_gross,
-                SUM(pres.net_salary) as total_net
-            FROM payroll_results pres
-            JOIN employees e ON pres.employee_id = e.id
-            JOIN payroll_runs pr ON pres.payroll_run_id = pr.id
-            GROUP BY e.department, e.country
-            """);
-        report = reportSourceRepository.save(report);
-        
-        String[] columns = {"department", "country", "employee_count", "total_gross", "total_net"};
-        String[] aliases = {"Department", "Country", "Employees", "Total Gross", "Total Net"};
-        
-        for (int i = 0; i < columns.length; i++) {
-            ReportColumn col = new ReportColumn();
-            col.setRptSrcId(report.getRptSrcId());
-            col.setRptColName(columns[i]);
-            col.setRptColAlias(aliases[i]);
-            col.setRptColOrder(i + 1);
-            col.setRptColDataType("VARCHAR");
-            reportColumnRepository.save(col);
-        }
-    }
-    
-    private void createCountryTotalsReport() {
-        ReportSource report = new ReportSource();
-        report.setRptName("country-totals");
-        report.setDescription("Country Payroll Totals");
-        report.setBaseQuery("""
-            SELECT 
-                e.country,
-                pr.payroll_month,
-                COUNT(DISTINCT e.id) as employee_count,
-                SUM(pres.gross_salary) as total_gross,
-                SUM(pres.tax_amount) as total_tax,
-                SUM(pres.pension) as total_pension,
-                SUM(pres.net_salary) as total_net
-            FROM payroll_results pres
-            JOIN employees e ON pres.employee_id = e.id
-            JOIN payroll_runs pr ON pres.payroll_run_id = pr.id
-            GROUP BY e.country, pr.payroll_month
-            """);
-        report = reportSourceRepository.save(report);
-        
-        String[] columns = {"country", "payroll_month", "employee_count", "total_gross", "total_tax", "total_pension", "total_net"};
-        String[] aliases = {"Country", "Month", "Employees", "Total Gross", "Total Tax", "Total Pension", "Total Net"};
-        
-        for (int i = 0; i < columns.length; i++) {
-            ReportColumn col = new ReportColumn();
-            col.setRptSrcId(report.getRptSrcId());
-            col.setRptColName(columns[i]);
-            col.setRptColAlias(aliases[i]);
-            col.setRptColOrder(i + 1);
-            col.setRptColDataType("VARCHAR");
-            reportColumnRepository.save(col);
-        }
     }
 }
