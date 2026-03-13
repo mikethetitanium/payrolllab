@@ -11,4 +11,5 @@ public class DashboardData {
     private Map<String, Long> headcountByCountry;
     private Map<String, BigDecimal> payrollByDepartment;
     private Map<String, BigDecimal> payrollByCountry;
+    private Long totalDepartments;
 }

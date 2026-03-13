@@ -28,6 +28,10 @@ public class DashboardService {
         String totalEmpQuery = "SELECT COUNT(*) FROM employees";
         Long totalEmp = jdbcTemplate.queryForObject(totalEmpQuery, Long.class);
         data.setTotalEmployees(totalEmp != null ? totalEmp : 0L);
+
+        String totaDeptsQuery = "select count(distinct department) from employees";
+        Long totalDept = jdbcTemplate.queryForObject(totaDeptsQuery, Long.class);
+        data.setTotalDepartments(totalDept!= null ? totalDept:0L);
         
         // Headcount by country
         String headcountQuery = "SELECT e.country, COUNT(*) as count FROM employees e GROUP BY e.country";
